@@ -530,7 +530,10 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         logger.debug("ERTRACE unknown backend: %s : %s", url, backend_name)
         raise RuntimeError("Unknown backend %s" % backend_name)
     connector = get_connector_from_name(backend_name)
+    logger.debug("ERTRACE connector: %s : %s : %s", backend_name, url, connector)
+
     klass = connector[3]  # BackendCmd for the connector
+    logger.debug("ERTRACE connector klass: %s : %s : %s", backend_name, url, klass)
 
     try:
         backend = None

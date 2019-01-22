@@ -147,6 +147,7 @@ kibiter_version = None
 
 
 def get_connector_from_name(name):
+    logger.debug("ERTRACE entered get_connector_from_name for %s ", name)
 
     # Remove extra data from data source section: remo:activities
     name = name.split(":")[0]
@@ -156,6 +157,8 @@ def get_connector_from_name(name):
     for cname in connectors:
         if cname == name:
             found = connectors[cname]
+    
+    logger.debug("ERTRACE exit get_connector_from_name for %s : %s ", name, found)
 
     return found
 
