@@ -515,6 +515,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    node_regex=False, studies_args=None, es_enrich_aliases=None):
     """ Enrich Ocean index """
 
+    logger.debug("ERTRACE entered enrich_backend for %s : %s", backend_name, url)
+
     backend = None
     enrich_index = None
 
@@ -525,6 +527,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         clean = False  # refresh works over the existing enriched items
 
     if not get_connector_from_name(backend_name):
+        logger.debug("ERTRACE unknown backend: %s : %s", url, backend_name)
         raise RuntimeError("Unknown backend %s" % backend_name)
     connector = get_connector_from_name(backend_name)
     klass = connector[3]  # BackendCmd for the connector
@@ -534,6 +537,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         backend_cmd = None
         if klass:
             # Data is retrieved from Perceval
+            logger.debug("ERTRACE klass present: %s : %s", backend_name, url)
+
             backend_cmd = init_backend(klass(*backend_params))
             backend = backend_cmd.backend
 
@@ -545,6 +550,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             enrich_index = ocean_index + "_enrich"
         if events_enrich:
             enrich_index += "_events"
+
+        logger.debug("ERTRACE got enrich_index: %s : %s", backend_name, enrich_index)
 
         enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map,
                                       db_user, db_password, db_host)
@@ -566,6 +573,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             enrich_backend.pair_programming = pair_programming
         if node_regex:
             enrich_backend.node_regex = node_regex
+        
+        logger.debug("ERTRACE before filter_raw_dict: %s : %s", backend_name, url)
 
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}
@@ -585,6 +594,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                         "prefix": {fname: fvalue}
                     }
                 )
+        
+        logger.debug("ERTRACE before get_ocean_backend: %s : %s", backend_name, url)
 
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
                                           no_incremental, filter_raw_dict,
