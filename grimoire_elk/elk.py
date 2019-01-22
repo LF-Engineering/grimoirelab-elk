@@ -665,6 +665,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                          backend_name, backend.origin, ex, exc_info=True)
         else:
             logger.error("Error enriching ocean %s", ex, exc_info=True)
+    except BaseException as bex:
+        logger.error("ERTRACE unhandled base exception %s : %s", backend_name, bex, exc_info=True)
 
     logger.info("Done %s ", backend_name)
 
