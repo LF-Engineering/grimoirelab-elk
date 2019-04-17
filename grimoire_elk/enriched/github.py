@@ -269,9 +269,9 @@ class GitHubEnrich(Enrich):
         other than the user who created the issue
         """
         comment_dates = [str_to_datetime(comment['created_at']) for comment in item['comments_data']
-                         if item['user']['login'] != comment['user']['login']]
+                         if 'user' in comment and comment['user'] is not None and item['user']['login'] != comment['user']['login']]
         reaction_dates = [str_to_datetime(reaction['created_at']) for reaction in item['reactions_data']
-                          if item['user']['login'] != reaction['user']['login']]
+                          if 'user' in reaction and reaction['user'] is not None and item['user']['login'] != reaction['user']['login']]
         reaction_dates.extend(comment_dates)
         if reaction_dates:
             return min(reaction_dates)
@@ -282,7 +282,7 @@ class GitHubEnrich(Enrich):
         other than the user who created the PR
         """
         review_dates = [str_to_datetime(review['created_at']) for review in item['review_comments_data']
-                        if item['user']['login'] != review['user']['login']]
+                        if 'user' in review and review['user'] is not None and item['user']['login'] != review['user']['login']]
         if review_dates:
             return min(review_dates)
         return None
@@ -298,7 +298,7 @@ class GitHubEnrich(Enrich):
     def get_num_commenters(self, item):
         """Get the number of unique people who commented on the issue/pr"""
 
-        commenters = [comment['user']['login'] for comment in item['comments_data']]
+        commenters = [comment['user']['login'] for comment in item['comments_data'] if 'user' in comment and comment['user'] is not None]
         return len(set(commenters))
 
     @metadata
