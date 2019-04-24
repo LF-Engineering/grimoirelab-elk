@@ -77,6 +77,7 @@ setup(name="grimoire-elk",
       test_suite='tests',
       scripts=["utils/p2o.py", "utils/gelk_mapping.py"],
       install_requires=[
+          'urllib3<1.25,>=1.21.1',
           'perceval>=0.9.6',
           'perceval-mozilla>=0.1.4',
           'perceval-opnfv>=0.1.2',
