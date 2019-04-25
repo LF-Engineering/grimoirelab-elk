@@ -33,6 +33,7 @@ from elasticsearch import Elasticsearch
 from grimoirelab_toolkit.datetime import (datetime_to_utc,
                                           str_to_datetime)
 from perceval.backends.core.git import GitRepository
+from perceval.errors import RepositoryError
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
@@ -675,7 +676,13 @@ class GitEnrich(Enrich):
 
         logger.debug("[update-items] Checking commits for %s.", self.perceval_backend.origin)
 
-        git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
+        git_repo = None
+        
+        try:
+            git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
+        except RepositoryError as e:
+            logger.warning("[git] repo %s not found, potentially still bootstrapping", self.perceval_backend.gitpath)
+            return
 
         try:
             current_hashes = set([commit for commit in git_repo.rev_list()])
