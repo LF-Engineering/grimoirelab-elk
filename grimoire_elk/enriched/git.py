@@ -674,7 +674,7 @@ class GitEnrich(Enrich):
             'value': [self.perceval_backend.origin]
         }
 
-        logger.debug("[update-items] Checking commits for %s.", self.perceval_backend.origin)
+        logger.info("[git] [update-items] Checking commits for %s.", self.perceval_backend.origin)
 
         git_repo = None
         
@@ -687,8 +687,10 @@ class GitEnrich(Enrich):
         try:
             current_hashes = set([commit for commit in git_repo.rev_list()])
         except Exception as e:
-            logger.error("Skip updating branch info for repo %s, git rev-list command failed: %s", git_repo.uri, e)
+            logger.error("[git] Skip updating branch info for repo %s, git rev-list command failed: %s", git_repo.uri, e)
             return
+        
+        logger.info("[git] [update-items] Fetching commits for %s.", self.perceval_backend.origin)
 
         raw_hashes = set([item['data']['commit']
                           for item in ocean_backend.fetch(ignore_incremental=True, _filter=fltr)])
@@ -727,8 +729,13 @@ class GitEnrich(Enrich):
                      self.perceval_backend.origin)
 
         # update branch info
+        logger.info("[git] [update-items] Deleting stale branches for %s.", self.perceval_backend.origin)
+
         self.delete_commit_branches(enrich_backend)
+        logger.info("[git] [update-items] Adding commit branches for %s.", self.perceval_backend.origin)
+
         self.add_commit_branches(git_repo, enrich_backend)
+        logger.info("[git] [update-items] Done %s.", self.perceval_backend.origin)
 
     def delete_commit_branches(self, enrich_backend):
         """Delete the information about branches from the documents representing
